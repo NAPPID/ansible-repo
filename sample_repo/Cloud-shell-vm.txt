@@ -1,5 +1,0 @@
-
-az group create --name Jenkins --location eastus
-az network vnet create --name Jen-vnet --resource-group Jenkins --address-prefixes 10.10.0.0/16 --subnet-name Jensubnet --subnet-prefixes 10.10.10.0/24 --location eastus
-az vm create --name Node-1 --image UbuntuLTS --size Standard_B2s --subnet-address-prefix 10.10.10.0/24  --location eastus --resource-group Jenkins --admin-username azureuser --admin-password Admin@123456
-az vm create --name Node-2 --image UbuntuLTS --size Standard_B2s --subnet-address-prefix 10.10.10.0/24  --location eastus --resource-group Jenkins --admin-username azureuser --admin-password Admin@123456
