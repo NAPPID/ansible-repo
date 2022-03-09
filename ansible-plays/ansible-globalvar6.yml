@@ -1,0 +1,16 @@
+---
+- name: Installing Software using global variables
+  hosts: "{{d}}"
+  become: yes
+  vars: 
+   - a: tomcat8
+   - b: present
+   - c: yes
+   - d: servers  
+  tasks:
+   - name: Installing /Uninstalling apps       
+     apt:
+      name: "{{a}}"
+      state: "{{b}}"
+      update_cache: "{{c}}"
+...

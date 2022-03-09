@@ -1,0 +1,16 @@
+---
+- name: Creating User ids and copy the some content into Home directory
+  hosts: all
+  become: yes
+  tasks:
+   - name: creating user ids on all managed nodes
+     user:
+      name: Intelliqit
+      password: Admin@123
+      home: /home/Intelliqit
+      state: present
+   - name: Copy the file into manage nodes
+     copy:
+      src: /etc/passwd
+      dest: /home/Intelliqit
+...

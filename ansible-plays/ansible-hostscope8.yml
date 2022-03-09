@@ -1,0 +1,19 @@
+---
+- name: Creating user account using Host scope vars
+  hosts: webserver
+  become: yes
+  vars:
+          #   - a: Sree
+          # - b: Admin@123
+          # - c: /home/{{a}}
+          #- d: 553456
+          #- e: /bin/bash
+  tasks:
+   - name: Creating user accounts
+     user:
+      name: "{{a}}"
+      password: "{{b}}"
+      home: "{{c}}"
+      uid: "{{d}}"
+      shell: "{{e}}"
+...

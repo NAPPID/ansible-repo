@@ -1,0 +1,20 @@
+---
+- name: Creating users based upon it's existance
+  hosts: all
+  become: yes
+  tasks:
+   - name: Create user ids on all machines
+     user:
+      name: Cherry
+     register: results
+   - name: Debug the results
+     debug:
+      var: results
+   - name: Setting password for new users
+     user:
+      name: Cherry
+      password: Admin@123
+      home: /home/Cherry
+     when:
+      results.changed == false
+...

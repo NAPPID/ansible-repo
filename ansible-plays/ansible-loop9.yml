@@ -1,0 +1,15 @@
+---
+- name: Uninstalling Apps from managed nodes
+  hosts: all
+  become: yes
+  tasks:
+   - name: Uninstalling apps
+     apt:
+      name: "{{item}}"
+      state: "{{d}}"
+      purge: yes
+     with_items:
+      - "{{a}}"
+      - "{{b}}"
+      - "{{c}}"
+...

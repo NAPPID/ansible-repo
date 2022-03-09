@@ -1,0 +1,25 @@
+---
+- name: Installing Apache with handlers
+  hosts: webserver
+  become: yes
+  tasks:
+   - name: Installing Apache
+     apt:
+      name: apache2
+      state: present
+      update_cache: yes
+     notify: Check URL response
+   - name: Modifying default page
+     copy:
+      content: "Welcome to IntelliqIT/n"
+      dest: /var/www/html/index.html
+     notify: Restart service
+  handlers:
+   - name: Restart service
+     service:
+      name: apache2
+      state: restarted
+   - name: Check URL response
+     uri:
+      url: http://10.182.0.3
+...

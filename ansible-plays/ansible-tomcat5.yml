@@ -1,0 +1,37 @@
+---
+- name: Installing tomcat8, Changing it's default port from 8080 to 9090
+  hosts: all
+  become: yes
+  tasks:
+   - name: Installing Tomcat8
+     apt:
+      name: tomcat8
+      state: present
+      update_cache: yes
+     tags:
+      - Tomcat
+      - app 
+   - name: updating user.xml
+     copy:
+      src: tomcat-user.xml
+      dest: /etc/tomcat8
+     tags:
+      - Prod
+   - name: Changing default port to 9090
+     replace:
+      regexp: '8080'
+      replace: '9090'
+      path: /etc/tomcat8/server.xml
+     tags:
+      - dev
+   - name: Restarting tomcat service
+     service:
+      name: tomcat8
+      state: restarted
+   - name: checking url response for manage01
+     uri:
+      url: http://10.182.0.3:9090
+   - name: Checking url response for manage02
+     uri:
+      url: http://10.182.0.4:9090
+...

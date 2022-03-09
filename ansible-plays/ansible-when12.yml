@@ -1,0 +1,19 @@
+---
+- name: Creating file upon it's status
+  hosts: all
+  become: yes
+  tasks:
+   - name: Checking file status with stat
+     stat:
+      path: /home/vmsai/d1
+     register: results
+   - name: Displaying output
+     debug:
+      var: results
+   - name: creating files by validating condition when
+     file:
+      name: /home/vmsai/d1
+      state: directory
+     when:
+      results.stat.exists == false
+...  

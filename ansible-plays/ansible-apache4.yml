@@ -1,0 +1,27 @@
+---
+- name: Installing Apache2 and modifying the default page
+  hosts: all
+  become: yes
+  tasks:
+   - name: Installing Apache2 on all nodes
+     apt:
+      name: apache2
+      state: present
+      update_cache: yes
+   - name: Modifying default page
+     copy:
+      content: "This is a modified Apache2 default file"
+      dest: /var/www/html/index.html
+   - name: restarting service
+     service:
+      name: apache2
+      state: restarted
+   - name: checking url for manage01 node
+     uri:
+      url: http://10.182.0.3
+      #status: 200
+   - name: checking url response for manage02 node
+     uri:
+      url: http://10.182.0.4
+      #status: 200
+...

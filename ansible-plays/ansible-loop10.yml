@@ -1,0 +1,15 @@
+---
+- name: Uninstalling Apps from managed nodes
+  hosts: all
+  become: yes
+  tasks:
+   - name: Uninstalling apps
+     apt:
+      name: "{{item.a}}"
+      state: "{{item.b}}"
+      update_cache: "{{item.c}}" 
+     with_items:
+      - {a: tree,b: present, c: no}
+      - {a: git,b: present,c: yes} 
+      - {a: apache2,b: present,c: yes}
+...
