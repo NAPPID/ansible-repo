@@ -1,0 +1,10 @@
+---
+- name: Installing NTP on both nodes
+  hosts: all
+  become: yes
+  tasks:
+   - name: Installing NTP on both the nodes
+     apt:
+      name: ntp
+      state: present
+---

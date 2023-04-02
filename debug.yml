@@ -1,0 +1,81 @@
+---
+- name: Debugging the plays
+  hosts: cent
+  vars_files:
+   - playbook_vars/test_vars
+  #become: yes
+  vars:
+   - web_package: apache
+     web_service: apache7
+  tasks:
+   - name: Displaying facts
+     debug:
+      msg:
+       - "{{ansible_distribution}}"
+       - "{{ansible_memfree_mb}}"
+         #- "{{ansible.builtin.env}}"
+       - "{{ansible_all_ipv4_addresses}}"
+       - "{{ansible_default_ipv4.address}}"
+     tags:
+      - debug
+   - name: Creating user on {{inventory_hostname}}
+     debug:
+      msg: "Configuring user {{item.name}} with home directory {{item.homedir}} have role of {{item.role}}"
+     with_items: "{{users}}"
+   - name: Configuring webservice {{inventory_hostname}} for service {{web_service}}
+     debug:
+      msg: "Configuring {{web_service}}"
+   - name: Display passwd file from {{ansible_hostname}}
+     shell:
+      cat /etc/passwd
+     register: passwd_file
+     tags:
+      - fact
+   - name: restating tomcat9 service on {{ansible_hostname}}
+     service:
+      name: tomcat9
+      state: restarted
+     register: service_status
+     tags:
+      - service
+   - name: Displying status message for service status
+     debug:
+      msg:
+       - "Restarted"
+       - "{{service_status}}"
+     when: service_status.changed == false
+     tags:
+      - service
+   - name: Displaying passwd file content
+     debug:
+      var: passwd_file
+     when: ansible_distribution == 'CentOS'
+     tags:
+      - fact
+   - name: getting facts from {{inventory_hostname}}
+     debug:
+      msg: 
+       - "{{ansible_distribution}}"
+       - "{{ansible_mounts}}"
+     tags:
+      - fact
+   - name: Getting {{service}} service status
+     shell:
+      service {{service}} status
+     register: cron_status
+     tags:
+      - cron
+   - name: service {{service}} status
+     debug:
+      var: cron_status.rc
+     tags:
+      - cron
+   - name: restarting service {{service1}}
+     service:
+      name: "{{service1}}"
+      state: "{{state}}"
+     when: cron_status.rc == 0
+     tags:
+      - cron
+
+...

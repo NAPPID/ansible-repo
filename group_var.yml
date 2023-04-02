@@ -1,0 +1,14 @@
+---
+- name: Playbook for installing list of packages from Host_group vars
+  hosts: 192.168.1.8
+  become: yes
+  gather_facts: false
+  vars:
+    - name: tomcaat9
+      state: present
+  tasks:
+    - name: Installing Packages
+      apt: 
+        name: "{{name}}"
+        state: "{{state}}"
+...

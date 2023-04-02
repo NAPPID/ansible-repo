@@ -1,0 +1,29 @@
+---
+- name: Extracting home directs and create with respect link files in tmp dir
+  hosts: localhost
+  tasks:
+   - name: Extracting home dirs from {{ansible_hostname}}
+     shell:
+      ls /home
+     register: home_dirs
+   - name: display dirs from debug module
+     debug:
+      msg: "{{home_dirs.stdout_lines}}"
+   - name: creating link files in /tmp dir
+     file:
+      path: /tmp/{{item}}
+      src: /home/{{item}}
+      state: link
+     loop: "{{home_dirs.stdout_lines}}"
+   - name: list dirs from tmp dir
+     shell:
+      ls /tmp
+     register: tmp_dirs
+   - name: debug tmp directories
+     debug:
+      msg:
+       - "{{tmp_dirs.stdout_lines}}"
+       - "{{tmp_dirs}}"
+     when: home_dirs.stdout_lines | map(attribute='debug')
+
+...
