@@ -1,0 +1,36 @@
+#Sai
+
+---
+- name: Playbook for Installing Tomcat9 on managed nodes
+  hosts: webservers
+  vars_files: 
+   - playbook_vars/test_vars
+  #become: yes
+  tasks:
+   - name: Installing "{{package}}"
+     apt:
+        name: "{{package}}"
+        state: "{{state}}"
+        update_cache: no
+   - name: change the default port to 9090 from 8080
+     replace:		
+      regexp: 8080
+      replace: "{{new_port}}"
+      path: "{{server_path}}"
+   - name: Restating service on all nodes
+     service:
+      name: "{{service_name}}"
+      state: "{{service_state}}"
+   - name: copy tomcat-users file into all nodes
+     copy:
+      src: files/tomcat-user.xml
+      dest: "{{dest}}"
+   - name: checking url response from all the nodes to node-1
+     uri:
+      url: http://192.168.1.8:{{new_port}}
+      status_code: 200
+   - name: Checking url response from all nodes to node-2
+     uri:
+      url: http://192.168.1.9:{{new_port}}
+      status_code: 200
+...

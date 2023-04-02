@@ -1,0 +1,12 @@
+---
+- name: Uninstalling Tomcat9 from Nodes
+  hosts: all
+  become: yes
+  gather_facts: false
+  tasks:
+    - apt:
+        name: tomcat9
+        state: absent
+        purge: yes
+        autoremove: yes
+...
