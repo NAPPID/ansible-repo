@@ -1,0 +1,61 @@
+
+git config --global user.name "mungaras783"
+git config --global user.email "official email"
+git config --global --list
+git config --global push.default "simple"
+git clone <source-centralrepo> <dest-localrepo> (default location is current dir)
+git init (for local workspace)
+after couple of updates to current working directory run following command
+git status
+if we notice any untracked files, then run
+untracking--->staging--->commit changes
+git add . (taking all the files from current working directory)
+git status
+git commit -m "message", it's best practice to have a UserStory, Ticket# in commit message.
+git rm --cached <file1> <file2> <file3> (to revert files from staging to untrack)
+.git folder contains repo folder, snap shots. it's a hidden folder
+git log (shows all commits from current working directory/repo)
+git log -number ('1' represents latest commit)
+git log --oneline (short desciption of commits)
+git log --oneline -1
+git show <commit-Id> (what differ between previous and current versions)
+git never consider empty folders.
+git push (pushing the changes from local to central repo)
+git clone <source-repo> destination-folder----> this will create another workspace and then we can edit the date. push them to central repo.
+git pull (Pulling the changes which were done by team mates/ sync or update repo)
+
+##################  Git Branching    ###########################
+git branch -a (list all branches)
+git branch <name of the branch> (creating branch)
+git checkout <name of the branch>
+git checkout -b <name of the branch> (creating and checkout together)
+Note: 
+    After crating any branch, it will carryforward the all the commits which were done earler at master level. 
+git merge <name of the branch> (while doing merge we should be in source branch ).
+all the commits would merge with master branch and sorted based on time stamps. 
+##############  Git Rebase  ###############################
+Assume, if master branch is much ahead with commits (based on time stamp). But another branch have latest code and head is point out to latest commit in master branch. so if we try to download/clone the code then we can get the latest code point out from head. But our updated code resides in another branch. 
+to sort this issue out, we can used "git rebase", this i can run from the another branch. so that head is point out to the latest commit from branch instead from master/main branch.
+git rebase <name of the branch> 
+after this command merge the branches 
+switch to main/master branch then run merge command.
+check the position of the HEAD by running command "git log --oneline"
+
+##############  Git cherry-pick   ########################
+This is the feature of git, which enables selectively pick only few commits and add them to the master branch. Developer might have created lot of commits on the branch. But in the end, ther are only few commits where working version of code is present. Only these commits have to be added to the master branch then we will use cherry-picking.
+Create few commits on master
+touch f1
+git add .
+git commit -m "a"
+repeat for b
+create a new branch and create few more commits on it
+git checkout -b dev
+touch f3
+git add .
+git commit -m "c"
+repeat till e
+git log --oneline
+select the commits that we want to move to master. Then move to master and perform cherrypicking
+git checkout master
+git cherry-pick <commit-id1> <commit_id2>
+After this HEAD is point out to <commit_id2>
