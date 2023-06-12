@@ -1,0 +1,34 @@
+
+- name: Extracting psd from node-1
+  hosts: ubuntu
+  become: yes
+  tasks:
+   - name: Trying to extracting sensitive info
+     slurp:
+      src: /tmp/secret.config
+     register: psd
+   - name: debugging the psd output
+     debug:
+      var: psd
+   - name: decoding output
+     debug:
+      msg: "{{ psd.content | b64decode }}"
+   - name: setting the content to new var
+     set_fact:
+      content: "{{ psd.content | b64decode }}"
+   - name: splitting it into new lines
+     set_fact:
+      out: "{{ content.split('\n') }}"
+   - name: output the file content in newlines
+     debug:
+      var: out
+   - name: getting psvadmin string from node-1
+     command:
+      "grep -i pscadmin /tmp/secret.config"
+     register: value
+   - name: output the grepiing value
+     set_fact:
+      pscadmin_secret: value.stdout_lines[0]
+   - name: output the secret
+     debug:
+      var: value.stdout_lines[0].split('=')[1]

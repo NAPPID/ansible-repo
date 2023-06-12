@@ -1,0 +1,86 @@
+
+
+---
+- name: Testing run_once module 
+  hosts: ubuntu
+  become: yes
+  tasks:
+   - name: Creating dir with {{inventory_hostname}} 
+     file:
+      path: /tmp/run
+      state: directory
+     run_once: yes
+     register: run
+     tags:
+      - once
+   - name: creating the files into {{inventory_hostname}}
+     file:
+      path: /tmp/run/{{item}}
+      state: touch
+     with_items:
+      - psc_console.crt
+      - psc_console.pub
+      - psc_console.jks
+      - psc_console.p12
+     run_once: yes
+     tags:
+      - once
+   - name: copying from {{inventory_hostname}} to {{ansible_server}}
+     fetch:
+      src: /tmp/run/{{item}}
+      dest: /tmp/
+      flat: yes
+     with_items:
+      - psc_console.crt
+      - psc_console.pub
+      - psc_console.jks
+      - psc_console.p12
+     run_once: yes
+     register: cert
+     tags:
+      - once
+   - name: deleting run folder from {{inventory_hostname}}
+     file:
+      path: /tmp/run/
+      state: absent
+     when: cert.changed != 'true'
+     run_once: yes
+     tags:
+      - once
+   - name: Printing hostnames
+     debug:
+      var: cert
+     run_once: yes
+     tags:
+      - once
+      #run_once: yes
+      #delegate_to: localhost
+   - name: Copying passwd file
+     copy:
+      src: /etc/passwd
+      dest: /tmp/
+      #run_once: yes
+   - name: Testing copy module
+     copy:
+      src: /tmp/passwd
+      dest: /tmp/temp
+      remote_src: yes
+      backup: yes
+   - name: Renaming Temp directories
+     copy:
+      src: /tmp/temp/
+      dest: /tmp/{{ansible_hostname}}-temp/
+      remote_src: yes
+      owner: osboxes
+      group: osboxes
+      mode: 644
+      directory_mode:
+   - name: Removing the old temp file from {{ ansible_hostname }}
+     file:
+      path: /tmp/temp
+      state: absent
+   - name: using fetch moule copying files from nodes
+     fetch:
+      src: /tmp/{{ansible_hostname}}-temp
+      dest: /tmp/{{ansible_hostname}}-temp
+...
