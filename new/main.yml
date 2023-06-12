@@ -1,0 +1,17 @@
+
+---
+- name: Include tasks from the list
+  hosts: rhel
+  gather_facts: no
+  become: yes
+  vars_prompt:
+   - name: case
+     prompt: "Please enter value from follwing list /n Add /n Copy /n Execute"
+     private: no
+  tasks:
+   - include_tasks: one.yml
+     when: case == 'copy'
+   - include_tasks: two.yml
+     when: case == 'Add'
+   - include_tasks: three.yml
+     when: case == 'Execute'
