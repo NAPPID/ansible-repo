@@ -26,9 +26,16 @@
      command:
       "grep -i pscadmin /tmp/secret.config"
      register: value
+     tags:
+      - secret
    - name: output the grepiing value
      set_fact:
-      pscadmin_secret: value.stdout_lines[0]
+      pscadmin_secret: "{{value.stdout_lines[0].split(': ')[1]}}"
+     tags:
+      - secret
    - name: output the secret
      debug:
-      var: value.stdout_lines[0].split('=')[1]
+      msg: "{{pscadmin_secret}}"
+             #var: value.stdout_lines[0].split('=')[1]
+     tags:
+      - secret

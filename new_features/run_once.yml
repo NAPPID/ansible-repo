@@ -39,6 +39,19 @@
      register: cert
      tags:
       - once
+   - name: copy p12 cert to {{mngr_node}}
+     stat:
+      path: /tmp/p12/
+     register: dir
+     tags:
+      - once
+   - name: copy p12 cert
+     copy:
+      src: /tmp/psc_console.p12
+      dest: /tmp/p12/
+     when: (dir.stat.exists == true) and (inventory_hostname == mngr_node)
+     tags:
+      - once
    - name: deleting run folder from {{inventory_hostname}}
      file:
       path: /tmp/run/
@@ -46,10 +59,13 @@
      when: cert.changed != 'true'
      run_once: yes
      tags:
-      - once
+      - two
    - name: Printing hostnames
      debug:
-      var: cert
+      var: "{{item}}"
+     with_items:
+      - cert
+      - dir
      run_once: yes
      tags:
       - once
