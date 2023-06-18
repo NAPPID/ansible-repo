@@ -1,0 +1,9 @@
+#sai
+
+name: nginx
+state: present
+
+sms: "This is from Hostvars"
+web_package: sshd
+web_service: ssh
+
