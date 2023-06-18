@@ -1,0 +1,17 @@
+
+- name: Displaying two.yml
+  debug:
+   msg: 
+    - "This is two.yml"
+    - "{{sms}}"
+    - "{{play_hosts}}"
+- name: Executing two yml file Cop the passwd file to node
+  copy:
+   src: /etc/passwd
+   dest: /tmp/
+  changed_when: true
+  when: "inventory_hostname == mngr_node"
+- name: set variable for next play
+  set_fact:
+   next: "Execute"
+ 

@@ -1,0 +1,20 @@
+
+---
+- name: Include tasks from the list
+  hosts: ubuntu
+  gather_facts: no
+  become: yes
+  vars:
+   sms: "This is from local play"
+          #mngr_node: 192.168.1.15
+  vars_prompt:
+   - name: case
+     prompt: "Please enter value from follwing list /n Add /n Copy /n Execute"
+     private: no
+  tasks:
+   - include_tasks: one.yml
+     when: case == 'copy'
+   - include_tasks: two.yml
+     when: case == 'Add'
+   - include_tasks: three.yml
+     when: (case == 'Execute') or (next is defined)

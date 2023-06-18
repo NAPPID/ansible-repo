@@ -1,0 +1,9 @@
+
+- name: Displaying three.yml
+  debug:
+   msg: "This is three.yml"
+- name: This is task from three yml file
+  file:
+   path: /tmp/three.yml
+   state: touch
+  when: "inventory_hostname == mngr_node"

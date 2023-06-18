@@ -1,0 +1,26 @@
+
+
+- name: Displaying one.yml play
+  debug:
+   msg: "This is one.yml file"
+- name: Executing one yml file Create folder with vaultpsd
+  file:
+   path: /tmp/{{testpsc}}.{{env}}
+   state: touch
+  delegate_to: localhost
+  tags:
+   - vault
+- name: Testing vaults
+  command: "{{item}}"
+  with_items:
+   - echo "Testing pscadminpsd {{testpsc}}"
+  delegate_to: localhost
+  tags:
+   - vault
+- name: Running this on {{inventory_hostname}}
+  file:
+   path: /tmp/{{testpsc}}.{{env}}
+   state: touch
+  when: "inventory_hostname == mngr_node"
+  tags:
+   - vault
