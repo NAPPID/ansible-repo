@@ -1,0 +1,110 @@
+
+
+#######################################   Terraform    ##########################################################
+
+Terraform commands:
+ init
+ refresh
+ plan
+ destroy
+ 
+Terraform lifecycle: 
+ createte_before_delete
+ prevent_remove
+ ignore_changes
+
+Immutable infrastructure:
+ If any changes made to the resources defined in tf file, then terraform will delete the old one and create the new one as define in tf state.
+ 
+count vs for_each:
+ for_each have more advantages over count. 
+ 
+Version Constraints: 
+source: video 45
+
+Programattic access is needed to access AWS from cmd/terraform. 
+so IAM policies should apply for users and roles has to assign to services.
+
+Provisionors:
+ Local-exex
+ remote-exec
+
+Terraform Taint
+Terraform Import
+
+Terraform Modules
+ custom module(local)
+ Registry modules( Verified & Community)
+
+terraform console: 
+
+TO test functions and making much interactive.
+
+Terraform Functions:
+
+Multiple AWS providers can be used, in order to support the cloud to deploy resources in multiple regions. 
+This can be achieved by using 'alias'.
+
+When we upgrade the cloud provider version, these changes are used to get tracked in "terraform.lock.hcl" file. Some times these upgrades can significantly \
+break the code due to compatible issues. 
+
+
+######################### Map Variable ##############################
+
+variable "awsprops" {
+    type = "map"
+    default = {
+    region = "us-east-1"
+    vpc = "vpc-5234832d"
+    ami = "ami-0c1bea58988a989155"
+    itype = "t2.micro"
+    subnet = "subnet-81896c8e"
+    publicip = true
+    keyname = "myseckey"
+    secgroupname = "IAC-Sec-Group"
+  }
+}
+
+provider "aws" {
+  region = lookup(var.awsprops, "region")
+}
+
+
+
+##################################   EC2     ################################################
+
+
+source: https://www.middlewareinventory.com/blog/terraform-aws-example-ec2/
+
+
+resource "aws_instance" "project-iac" {
+  ami = lookup(var.awsprops, "ami")
+  instance_type = lookup(var.awsprops, "itype")
+  subnet_id = lookup(var.awsprops, "subnet") #FFXsubnet2
+  associate_public_ip_address = lookup(var.awsprops, "publicip")
+  key_name = lookup(var.awsprops, "keyname")
+
+
+  vpc_security_group_ids = [
+    aws_security_group.project-iac-sg.id
+  ]
+  root_block_device {
+    delete_on_termination = true
+    iops = 150
+    volume_size = 50
+    volume_type = "gp2"
+  }
+  tags = {
+    Name ="SERVER01"
+    Environment = "DEV"
+    OS = "UBUNTU"
+    Managed = "IAC"
+  }
+
+  depends_on = [ aws_security_group.project-iac-sg ]
+}
+
+
+output "ec2instance" {
+  value = aws_instance.project-iac.public_ip
+}
