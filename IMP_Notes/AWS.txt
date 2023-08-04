@@ -1,0 +1,48 @@
+
+
+###########################  AWS   ######################################
+
+EC2
+
+eni
+user data
+curl http://169.254.169.254/latest/meta-data
+pip=$(http://169.254.169.254/latest/meta-data/local-ipv4)
+pub-ip=$(http://169.254.169.254/latest/meta-data/public-ipv4)
+
+AMI,IAM role, Storage, Monitoring, AV Zone, Networking, Snapshots, High Avalability, Auto scaling groups, ALB, NLB
+
+Launch Templates --> For deploying the same servers.
+    source: AWS-B28, Video12.
+    This is used for deploying servers only. This can't be used for creaating any other resource in AWS. 
+   usage: Create a launch template for creating a server and use the same template id in AWS cloudShell console and run the for loop for deploying 3 servers. 
+   
+Spot Instances vs on demand Instances. 
+
+It's recommended for K8s lab. As soon as on demand get the demand then immediately it terminqee
+
+
+########################  EBS  ################################
+
+for diskmgmt commands: teluguitfactory(disk mgmt in linux course).
+
+lsblk
+fdisk ---> crate partiotion from disk
+    n -> new partiotion 
+    p -> primary partiotion
+    go with default values
+    finally enter w --> write the changes
+    then create file system:
+        mkfs.ext4 /dev/xvdf1  --> Make partition (ext4/xfs)
+        press lsblk
+        create a folder named /ebsvol then mount newly created partiotion to this dir. 
+        press lsblk.
+        But these changes are not perminant, once we reboot/shtdown the machine these changes will go off. To make this persistant update the changes in fstab.
+        /etc/fstab
+        after the entering the entry in the fstab file then run command 'mount -a'. It's refresh all the mount points. 
+        For every reboot demon will look for fstab file and will mount the mount points as defined in fstab file. 
+        
+        If we extend the EBS volume , then it won't reflect immediately in lsblk. To effect the changes 
+        growpart /dev/xvdf 1 ---> for extending the partiotion. 
+        also file system shoud get these changes, then run 'resize2fs /dev/xvdf1'. 
+    
