@@ -21,3 +21,5 @@ git push (pushing the changes from local to central repo)
 git clone <source-repo> destination-folder----> this will create another workspace and then we can edit the date. push them to central repo.
 git pull (Pulling the changes which were done by team mates/ sync or update repo)
   
+git remote add testing-repo https://github.com/NAPPID/Terraform-aws.git
+git push testing-repo

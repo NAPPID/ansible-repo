@@ -108,3 +108,26 @@ resource "aws_instance" "project-iac" {
 output "ec2instance" {
   value = aws_instance.project-iac.public_ip
 }
+
+
+#########################   Functions  ###########################################
+
+
+length
+distinct
+sort
+element(
+ceil
+join
+count=var.enabled ? 1 : 0
+
+
+#########################  VPC Peering  ###############################
+
+Peering between 2 VPCs which are resides on same region. 
+    . Create 2 VPCs with different CIDR address space. (No IP overlapping allowed).
+    . Create one VM on each VPC.
+    . Create peering connection between these 2 VPCs. (VPC requestor and VPC acceptor).
+    . Acceptor should accept the request made by the requestor VPC.
+    . Update routing table entries with respective peering id on both the routing tables.
+    . 
