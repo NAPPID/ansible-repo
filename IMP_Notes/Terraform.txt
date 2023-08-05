@@ -51,6 +51,9 @@ break the code due to compatible issues.
 
 ######################### Map Variable ##############################
 
+best source: video 14 (AWS b28), 25 mint. 
+
+
 variable "awsprops" {
     type = "map"
     default = {

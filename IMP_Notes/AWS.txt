@@ -45,4 +45,43 @@ fdisk ---> crate partiotion from disk
         If we extend the EBS volume , then it won't reflect immediately in lsblk. To effect the changes 
         growpart /dev/xvdf 1 ---> for extending the partiotion. 
         also file system shoud get these changes, then run 'resize2fs /dev/xvdf1'. 
-    
+
+
+############ Security  ############################
+
+NSG is works as Firewall. 
+
+But need to find the vulnerabilities in application and OS level. These has to be sorted out, first deploy a VM and scan for vulnerabilities and remediate them. 
+Then create a AMI from this then deploy VMs from this AMI when ever we need. 
+
+AWS inspector is the one the tool offered by AWS. 
+
+Here we can create a policies and scanning rules against machines and give a name for this. 
+
+once we run the scan. we will get the report, it contains all the vulnerabilities 
+
+
+##########################  AMI Images  ################################
+
+AMI custom images can be created using packer. 
+All listed images in default view are carrying with many vulnerabilities, it leads to significant risk. to mitigate this issue, we have to remediate them before deploy.
+usually this mitigation can be accomplish through ansible. 
+
+vulnerabilities are caught through scanners such as Qualys, Nexus, Nexpose ,AWS inspector. 
+After mitigating all the vulnerabilities, reboot the machine, then again initiate the scan. we haveto repeat this process untill it become zero vulnerabilities.
+later generate AMI from this VM. so that upcoming deployments from this image will have minimal vulnerabilities. 
+
+###################### Snapshots  ##########################################
+
+It's a backup for EBS volume. AMI are consider as root volume backups. 
+
+If we attach 10Gb EBS volume to any server, and keep adding some files to it. Then if we take snapshot, then it's resultant size would be 10gb. 
+Later we add few more files to it, then 2nd snapshot conatains all files( files from 1st snap and 2nd). 
+Later we add few more files to it, then 3nd snapshot conatains all files( files from 1st snap, 2nd and 3rd).
+
+At any moment if we would like to restore the volume, then we can take latest snapshot. It covers all the files. 
+
+But now if we delete somefiles then we have taken snapshot4. 
+Also added few files then taken snapshot5. 
+
+In this case, if we would like to restore all the files then. we have to restore the snapshot5 and snapshot3 to recover all the files.  
