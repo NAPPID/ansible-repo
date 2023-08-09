@@ -84,4 +84,63 @@ At any moment if we would like to restore the volume, then we can take latest sn
 But now if we delete somefiles then we have taken snapshot4. 
 Also added few files then taken snapshot5. 
 
-In this case, if we would like to restore all the files then. we have to restore the snapshot5 and snapshot3 to recover all the files.  
+In this case, if we would like to restore all the files then. we have to restore the snapshot5 and snapshot3 to recover all the files. 
+
+
+########################  Profile ##############################################
+
+aws configure --profile
+
+[default]
+region = us-east-1
+output = json
+[profile temp]
+region = temp-region
+output = json
+
+provider "aws" {
+    profile = "temp"
+}
+
+
+
+###################  Data sources  ##############################################    **********  IMP  ****************
+
+data "aws_instance" "test_server" {
+  for_each    = var.instance_ids
+  instance_id = each.value
+  filter {
+    name   = "tag:Environment"
+    values = ["test"]
+  }
+  filter {
+    name   = "instance-state-name"
+    values = ["running"]
+  }
+}
+
+resource "aws_ebs_volume" "test_server_drive" {
+  for_each          = data.aws_instance.test_server
+  availability_zone = data.aws_instance.test_server[each.key].availability_zone
+  size              = var.drive_size
+}
+
+resource "aws_volume_attachment" "test_server_drive_attach" {
+  for_each    = data.aws_instance.test_server
+  device_name = "/dev/sdb"
+  volume_id   = aws_ebs_volume.test_server_drive[each.key].id
+  instance_id = data.aws_instance.test_server[each.key].id
+}
+
+
+
+#########################################  loops   #############################################################
+
+output "instance_ip_addresses" {
+  # Result is a map from instance id to private and public IP addresses, such as:
+  #  {"i-1234" = ["192.168.1.2","54.234.188.251,] "i-5678" = ["192.168.1.5","3.90.189.190",] }
+  value = {
+    for instance in aws_instance.server:
+      instance.id => instance.private_ip
+  }
+}
