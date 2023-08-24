@@ -87,6 +87,30 @@ Also added few files then taken snapshot5.
 In this case, if we would like to restore all the files then. we have to restore the snapshot5 and snapshot3 to recover all the files. 
 
 
+######################  SSO  ################################################
+
+Configure Directory service (Windows AD Managed), with some domain name(myworld.local). This will take 30 minutes to finish the installation. we should pass the VPC where our -
+servers and apps are hosted. Later provide the 2 public subnets. 
+
+After the configure, keep a note about the DNS server IPs. 
+
+Deploy windows server with t2.large sized VM. Join this server into domain by updating the DNS entries in network settings. 
+
+After reboot, configure AD LDS in that server, add few user records and one security group. 
+
+Then open SSO in portal, open the settings and enable the SSO. Later keep the identity source as "Active Directory". Later provide the domain name (it automatically fetch the details).
+
+we should invite the another AWS account and add this into seperate oraganization unit for administration purpose. 
+
+Now create "Permission Sets" --> Name them with properly.
+
+After SSO setup, open AWS accounts from SSO page, then pick the account from organization unit-->select account-->search user/group from the search bar -->select rspect user -->
+
+select the "Permission sets" --> after this user can have permissions what ever defined in permission sets. 
+
+Validation: Open SSO -->settings--->look for url --> copy and open this in browser---> then enter the AD creds for the user who ever have access over 
+
+
 ########################  Profile ##############################################
 
 aws configure --profile
@@ -144,3 +168,105 @@ output "instance_ip_addresses" {
       instance.id => instance.private_ip
   }
 }
+
+
+
+#####################################  IAM ###########################################################
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:RevokeSecurityGroupIngress",
+                "ec2:AuthorizeSecurityGroupEgress",
+                "ec2:AuthorizeSecurityGroupIngress",
+                "ec2:UpdateSecurityGroupRuleDescriptionsEgress",
+                "ec2:CreateSecurityGroup",
+                "ec2:RevokeSecurityGroupEgress",
+                "ec2:DeleteSecurityGroup",
+                "ec2:ModifySecurityGroupRules",
+                "ec2:UpdateSecurityGroupRuleDescriptionsIngress"
+            ],
+            "Resource": [
+                "arn:aws:ec2:us-east-1:685776296081:security-group/*",
+                "arn:aws:ec2:us-east-1: /vpc-03073d0cc5f391a7a"
+                ]
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeSecurityGroupRules",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeSecurityGroups"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+
+
+
+
+
+Subnet creation: 
+
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Statement1",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeVpcs",
+                "ec2:DescribeRouteTables",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeDhcpOptions",
+                "ec2:DescribeNetworkAcls",
+                "ec2:Describe*",
+                "ec2:DescribeTags"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "CreatingSubnets",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeSubnets",
+                "ec2:CreateSubnet",
+                "ec2:ModifyVpcAttribute",
+                "ec2:DeleteSubnet",
+                "ec2:ModifySubnetAttribute",
+                "ec2:CreateTags"
+            ],
+            "Resource": [
+                "arn:aws:ec2:us-east-1:685776296081:vpc/vpc-03073d0cc5f391a7a",
+                "arn:aws:ec2:us-east-1:685776296081:subnet/*"
+            ],
+            "Condition": {
+                "ArnEquals": {
+                    "ec2:Vpc": "arn:aws:ec2:us-east-1:685776296081:vpc/vpc-03073d0cc5f391a7a"
+                }
+            }
+        }
+    ]
+}
+
+
+
+
+
+
+
+
+
+
+
+#########################  STS  decode ######################################
+
+
+aws sts decode-authorization-message --encoded-message $MSG --output text | jq '.'
