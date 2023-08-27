@@ -270,3 +270,90 @@ Subnet creation:
 
 
 aws sts decode-authorization-message --encoded-message $MSG --output text | jq '.'
+
+
+
+
+#######################  S3 Policies  ########################################
+
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "LimitS3Access",
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListAllMyBuckets",  ### Listing the buckets
+                "s3:ListBucket",        ### Listing the content in buckets
+                "s3:GetObject"          ### Download the content 
+            ],
+            "Resource": [
+                "arn:aws:s3:::*"
+            ]
+        }
+    ]
+}
+
+
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "LimitS3Access",
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListAllMyBuckets"
+            ],
+            "Resource": [
+                "arn:aws:s3:::*"
+            ]
+        },
+        {
+            "Sid": "ListContentInBucket",
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListBucket",
+                "s3:GetBucketLocation"
+            ],
+            "Resource": [
+                "arn:aws:s3:::testing-mungaras783",
+                "arn:aws:s3:::testing-one-mungaras783"
+            ]
+        },
+        {
+            "Sid": "DownloadContent",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:GetObjectAcl",
+                "s3:PutObject",
+                "s3:PutObjectAcl",
+                "s3:DeleteObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::testing-one-mungaras783/MyDrive/*"
+            ]
+        }
+    ]
+}
+
+
+
+Resource S3 Policy for deny all Prinicipals 
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "DenyAll",
+            "Effect": "Deny",
+            "Principal": "*",
+            "Action": "s3:*",
+            "Resource": "arn:aws:s3:::testing-one-mungaras783/*"
+        }
+    ]
+}
+
+
