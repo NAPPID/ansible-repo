@@ -1,0 +1,20 @@
+
+
+---
+   - name: Creating {{tomcat_user}} group
+     group:
+      name: "{{tomcat_user}}"
+      state: present
+     become: true
+   - name: Creating tomcat user 
+     user:
+      name: "{{tomcat_user}}"
+      state: present
+      shell: /bin/fasle
+      group: "{{tomcat_user}}"
+      append: yes
+      createhome: no
+      password: "{{tomcat_psd}}"
+      system: yes
+     become: true
+

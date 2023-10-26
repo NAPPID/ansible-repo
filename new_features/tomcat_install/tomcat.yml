@@ -1,0 +1,74 @@
+
+---
+   - name: Create tomcat user
+     user:
+      name: "{{tomcat_user}}"
+      createhome: no
+      system: yes
+      state: present
+      shell: /bin/false
+      password: "{{tomcat_psd}}"
+   - name: Creating group tomcat
+     group:
+      name: "{{tomcat_user}}"
+      state: present
+   - name: Creating directory
+     file:
+      name: "{{tomcat_location}}"
+      state: directory
+      mode: 0755
+      owner: "{{tomcat_user}}"
+      group: "{{tomcat_user}}"
+      recurse: yes
+     register: dir
+   - name: Download & unarchive the tomcat
+     unarchive:
+      src: https://dlcdn.apache.org/tomcat/tomcat-{{tomcat_major_version}}/v{{tomcat_major_version}}.{{minor_sub_version}}/bin/apache-tomcat-{{tomcat_major_version}}.{{minor_sub_version}}.tar.gz
+      dest: "{{tomcat_location}}"
+      remote_src: yes
+      mode: 0755
+      owner: "{{tomcat_user}}"
+      group: "{{tomcat_user}}"
+     register: zip
+   - name: Creating sym link to tomcat folder
+     file:
+      src: "{{tomcat_location}}/apache-tomcat-{{tomcat_major_version}}.{{minor_sub_version}}"
+      path: "{{link_location}}"
+      owner: "{{tomcat_user}}"
+      group: "{{tomcat_user}}"
+      mode: 0755
+      state: link
+     register: link
+   - name: Copy environment variable file
+     copy:
+      src: setenv.sh.j2
+      dest: "{{link_location}}/bin/setenv.sh"
+      owner: "{{tomcat_user}}"
+      group: "{{tomcat_user}}"
+      mode: 0755
+   - name: start the daemon
+     systemd:
+      daemon_reload: true
+     tags: 
+      - daemon
+     register: reload
+   - name: start the service tomcat10
+     shell: "{{item}}"
+     with_items:
+      - sh setenv.sh
+      - sh startup.sh
+     args:
+      chdir: "{{link_location}}/bin"
+     become: yes
+     become_user: root
+     become_method: sudo
+     register: start
+   - name: debug the output
+     debug:
+      var: "{{item}}"
+     with_items:
+      - dir
+      - zip
+      - link
+      - reload
+      - start
