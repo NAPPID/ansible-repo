@@ -583,3 +583,30 @@ we can perform same from the following file:
 	
 	Devops:
 	https://www.youtube.com/watch?v=sbPujz8QFGQ&list=PL4_vx17AgknMJaVn0LTg-OZIhYNIBrigo&index=2
+    
+#######################################       Ansible ########################################################
+
+- name: touch files with an optional mode
+  file:
+    dest: "{{item.path}}"
+    state: touch
+    mode: "{{item.mode|default(omit)}}"
+  loop:
+    - path: /tmp/foo
+    - path: /tmp/bar
+    - path: /tmp/baz
+      mode: "0444"
+      
+
+"{% if ansible_architecture == 'x86_64' %} x64 {% else %} x86 {% endif %}"
+
+
+ansible-playbook -i inventory.yml playbook.yml --ask-vault-pass
+
+include_tasks: prerequisites_{{ ansible_os_family | lower }}.yml
+
+ ansible-playbook main.yml --limit 'tomcat:!tomcat-host2'   https://docs.ansible.com/ansible/latest/inventory_guide/intro_patterns.html
+ 
+ansible-vault encrypt_string Tomcat@123 --name tomcat-psd  ---> Screen will prompt for passwords
+
+ 

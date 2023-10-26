@@ -1,6 +1,7 @@
 
 
 kubectl run mycont1 --rm -it --image busybox -- sh
+kubectl exec -it mycont1 -- /bin/bash
 kubectl version --short
 chkconfig kubelet on ----> This will keep service on any run levels. 
 
@@ -10,7 +11,40 @@ kubectl get pods -n <name of namespace> ---> pods from respective name space
 kubectl get pods -n kube-system ---> default pods from "kube-system" namespace.
 kubectl get pod testpod -o yaml or json
 kubectl get pods -l label=
+
+kubectl get pods --selector app=redis
+
 kubects logs <pod name>
+
+kubectl delete --all pods
+
+kubectl get all
+kubectl get pods --show-labels
+kubectl label pods httpd-pod status=running
+kubectl label --overwrite pods httpd-pod role=master
+kubectl label pods httpd-pod status-
+
+kubectl edit pod <pod-name> ----> For editing the configuration of the running pod. 
+kubectl delete pod <pod-name>
+kubectl run testpod --image=index.docker.io/sreeharshav/rollingupdate:v1
+
+kubectl expose pod testpod --port=8000 --target-port=80 --type=NodePort  ---> For exposing the pod to outside using NodePort service. 
+
+kubectl expose rc test-rc --port=8000 --target-port=80 --type=NodePort  ----> For exposing entire Replication Controller. 
+
+kubectl port-forward pod/testpod 8888:80 ---> Port forwarding, instead of creating service everytime, we can use port-forwarding for quick testing. 
+
+kubectl scale --replicas=2 -f replicaset.yml
+
+kubectl scale deploy myweb --replicas=4
+
+kubectl edit deploy myweb  ---> Edit the object properties. 
+
+
+kubectl port-forward pod/deploy-app-6f555897ff-7lxgt 8888:80
+
+kubectl rollout restart deploy deploy-app
+
 
 kubectl run mynginx --image=nginx --dry-run=client -o yaml > k8s-manifest/dryrun.yml
 
@@ -30,6 +64,8 @@ kubectl api-resources -o wide  --->List all supported object's API version.
 kubectl explain pod ---> explain the what is pod (any k8s object). 
 
 kubectl exec -it testpod -- bash ---> to get into the pod. 
+
+Communication can 
 
 ###############################  Replication Controller      ##########################################################
 
