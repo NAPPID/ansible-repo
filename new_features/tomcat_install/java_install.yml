@@ -1,0 +1,67 @@
+
+---
+   - name: Checking java on {{ ansible_hostname }}
+     shell: "java --version"
+     register: java
+     ignore_errors: true
+     become: yes
+     become_user: root
+   - name: Creating stage directory
+     file:
+      path: "{{java_stage_dir}}"
+      state: directory
+      owner: "{{tomcat_user}}"
+      mode: 0755
+      group: "{{tomcat_user}}"
+      recurse: yes
+   - name: check status for download file
+     stat:
+      path: ../jdk-{{java_version}}-linux-{{arch}}_bin.tar.gz
+     register: status
+     delegate_to: localhost
+     tags:
+      - status
+   - name: Download jdk from internet
+     get_url:
+      url: https://download.oracle.com/java/{{java_major_version}}/archive/jdk-{{java_version}}_linux-{{arch}}_bin.tar.gz
+      dest: "{{java_stage_dir}}/jdk-{{java_version}}_linux-{{arch}}_bin.tar.gz"
+     register: download
+     when: not(status.stat.exists)  #status.stat.exists != true
+     tags: 
+      - status
+   - copy:
+      src: jdk-{{java_version}}_linux-{{arch}}_bin.tar.gz
+      dest: "{{java_stage_dir}}"
+     when: status.stat.exists #status.stat.exists == true
+     tags:
+      - status
+   - name: Installing Java on {{ ansible_hostname }}
+     unarchive:
+      src: "{{java_stage_dir}}/{{java_tar_file}}"
+      dest: "{{java_stage_dir}}"
+      #copy: no
+      remote_src: yes
+      mode: 0755
+      owner: "{{tomcat_user}}"
+      group: "{{tomcat_user}}"
+      creates: "{{java_stage_dir}}/jdk-{{java_version}}"
+     register: jdk_install
+     tags:
+      - jdk
+   - name: create sym link on {{ inventory_hostname }}
+     file:
+      src: "{{java_stage_dir}}/jdk-{{java_version}}"
+      dest: "{{java_sym_dir}}"
+      state: link
+      owner: "{{tomcat_user}}"
+      group: "{{tomcat_user}}"
+      mode: 0755
+   - name: checking download status
+     debug:
+      var: "{{ item }}"  
+     with_items: 
+      - download
+      - java
+      - status
+      - jdk_install
+        #- version
