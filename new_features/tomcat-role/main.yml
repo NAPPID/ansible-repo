@@ -1,0 +1,42 @@
+
+---
+- name: Installing java & Tomcat on ec2 machines
+  hosts: all
+  become: yes
+  #become_user: root
+  vars_files:
+   - playbook_vars/tomcat_vars.yml
+  tasks:
+   - name: get content from server
+     command: 'cat /usr/share/tomcat10/bin/setenv.sh'
+     register: temp
+     tags: temp
+   - name: Print the variables from tasks section 
+     debug:
+      var: "{{item}}"
+     loop:
+      - tomcat_user
+      - java_version
+      - tomcat_psd
+      - temp
+     tags: temp
+   - name: Create psd file
+     file:
+      name: ~/psd.txt
+      state: touch
+     register: psd
+     tags:
+      - psd
+   - name: Inserting content into psd file
+     lineinfile:
+      path: ~/psd.txt
+      line: "{{tomcat_psd}}"
+     tags:
+      - psd
+  roles:
+   - role: pre_tasks
+     tags: pre
+   - {role: java, tags: java_install}
+   - {role: tomcat, tags: tomcat_install}
+     #- {role: pre_tasks, tags: pre}
+

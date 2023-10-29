@@ -1,0 +1,21 @@
+
+---
+   - name: setting the facts
+     set_fact:
+      arch: "{% if ansible_architecture == 'x86_64' %}x64{% else %}x86{% endif %}"
+   - debug: 
+      var: "{{ item }}"
+     with_items:
+             #- ansible_distribution
+             #- ansible_os_family
+             #- ansible_architecture
+             #- ansible_system
+        #- ansible_facts
+      - arch
+        #- java_version
+      - tomcat_location
+        #- tomcat_major_version
+      - java_tar_file
+        #- link_location
+        
+        #- "{{link_location}}/tomcat{{tomcat_major_version}}"

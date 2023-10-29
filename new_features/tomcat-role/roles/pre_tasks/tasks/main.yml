@@ -1,0 +1,7 @@
+
+---
+- debug:
+   msg: "Running mail file from pre_task role"
+- include_tasks: facts.yml
+- include_tasks: users.yml
+...
