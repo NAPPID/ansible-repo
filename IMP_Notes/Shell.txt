@@ -59,3 +59,14 @@ cat -n /etc/shell
 head -n15 /etc/passwd | tail -5
 awk 'NR>=10 && NR<=15 {print}' /etc/passwd
 sed -n '11,15p' /etc/passwd
+
+
+################################ scripting  #######################################################
+source: Sreeharsha new script
+
+aws ec2 describe-vpcs | jq ".Vpcs[].CidrBlockAssociationSet[].CidrBlockState.State" -r
+cat /etc/passwd | grep -Ei "osboxes" |tee -a /tmp/user.log ---> output will be redurected to /tmp/user.log file, also displays it on screen if we use 'tee'.
+kgf >> /tmp/command.log 2>&1 ---> redirecting errors where output is storing.
+ls -l /tmp/ 2>> /tmp/command.log 1>&2 ---> redirecting output where errors are storing.
+/dev/null ---> discarding the output & error. 
+echo "!@#$%^&*" | fold -1 | shuf | head -1

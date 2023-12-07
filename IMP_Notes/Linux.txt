@@ -451,6 +451,56 @@ grep -i '^contex' <filelocation>
 grep 'context$' <filelocation> ---> lines which are end with context
 grep '[0-9]' <filelocation> ---> Lines which contains numbers
 grep '^[0-9]' <filelocation> ---> Lines which contains numbers --> Lines are starts with numbers.
+grep -i ---> no casesensitive
+grep -w ---> only word
+grep -v ---> except word
+grep -n ----> line number
+grep -c ----> instances count
+grep -l ----> name of the file (grep -l "context" file1 file2 file3)
+grep -r -----> Recursive search (grep -r "context" *)
+grep -A 1 "context"----> Display one line after the instance matches
+grep -B 1 "context"----> Display one line before the context matches
+grep -C 1 "context"----> Dosplay one line before & After the context matches.
+grep -f file_name target_file ---> searches for the list which are stored in a file (file_name) and looking for these in atarget file/s. 
+grep -e "context1" -e "context2" -e "context3" -e "context4" target_file.
+grep -E "context1|context2|context3" target_file.
+
+#################################  Regular expressions  ##########################################
+
+grep -E "context1|context2" file ---> search for multiple pattren
+grep -E "^xyz" file ---> search for pattren starts with string "xyz"
+grep -E "xyz$" file ----> search for pattren which is ended with "xyz"
+grep -E "^$" file ----> search for empty strings
+grep -E "\^" file ----> search for pattren starts with char "^" ("\" is a escape character)
+grep -E "t..s" file ---> search for pattren which are contains 't' and can fill any of two chars in the place of ".".
+grep -E "\." file -----> Lines which are contains symbol ".".
+grep -E "line\b" file ---> search for the context "line" (shoud have space after the context) in file. grep -E "\bline\b" file. 
+grep -E "yf?" file ---> '?' here char 'f' can repeat 0 to 1 time only. 
+grep -E "yf*" file" ---> search for pattren where 
+grep -E "yf+" file ----> after the 'yf', at least one char shoube present. 
+grep -E "[tTfY]" file ---> look for any of the chars surrounded in square brackets. alternative grep -E "t|T|f|Y" file. 
+grep -E "[a-f]" file ---> alternative: grep -E "a|b|c|d|e|f" file. 
+grep -E "[a-dp-r] file ---> alternative grep -E "[abcdpqr]" file
+grep -E "^[xy]" file ---> looking for pattren either starts with 'x' or 'y'. 
+grep -E "[^xy]" file ----> looking pattrens which are not have eitther 'x' and 'y'. 
+grep -E "yf{4}" file ----> look for pattren "yfffff". Alternative: grep -E "yfffff" file. 
+grep -E "yf{3,4}" file ----> char 'f' may repeats either '3' or '4' times.
+grep -E "yf{3,4}\b" ----> char 'f' may repeat 3 or 4 times, but should have space after the word. 
+
+
+
+################################################# cut command  ###############################
+head /etc/passwd | cut -c 2
+head /etc/passwd | cut -c 1-2 or head /etc/passwd | cut -c 1,2 or head /etc/passwd | cut -c -2
+head /etc/passwd | cut -b 1-2 or head /etc/passwd | cut -b 1,2 or head /etc/passwd | cut -b -2
+head /etc/passwd | cut -d ':' -f 1 or head /etc/passwd | cut -d ':' -f 1,2 or head /etc/passwd | cut -d ':' -f 1-2
+head /etc/passwd | cut -d ':' -f -3 --output-delimiter=' '
+head /etc/passwd | cut -d ':' -sf -3   ---> surpassing delemeter
+ansible --version | grep -E "^ansible" | cut -d ' ' -f 2  or ansible --version | head -1 | cut -d ' ' -f 2
+head -n 5 /etc/passwd | cut -d ':' -f 1-4 | tr ':' ' ' ---> replacing symbol ':' with space' ' from the output.
+head -n 5 /etc/passwd | cut -d ':' -f 1-4 | tr ':' ' ' | tr [:lower:] [:upper:]  ---> convert generated output from lower chars to upper chars.
+echo "!@#$%^&*" | fold -1 | shuf | head -1
+
 
 
 ############################   Compress / Archieve   ######################
@@ -583,6 +633,17 @@ we can perform same from the following file:
 	
 	Devops:
 	https://www.youtube.com/watch?v=sbPujz8QFGQ&list=PL4_vx17AgknMJaVn0LTg-OZIhYNIBrigo&index=2
+    
+
+find ~/ -type f -name setenv.sh.j2   https://www.plesk.com/blog/various/find-files-in-linux-via-command-line/
+
+https://www.freecodecamp.org/news/how-to-search-for-files-from-the-linux-command-line/
+
+
+awk '/role/ {print NR,$0}' main.yml | wc -l   https://www.geeksforgeeks.org/awk-command-unixlinux-examples/
+
+
+ sudo firewall-cmd --zone=public --add-port=8080/tcp         https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-using-firewalld-on-centos-8
     
 #######################################       Ansible ########################################################
 
