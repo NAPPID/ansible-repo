@@ -1,0 +1,20 @@
+
+#!/bin/bash
+export JAVA_HOME=/usr/bin/java
+export PATH=$JAVA_HOME/bin:$PATH
+export CATALINA_BASE={{ link_location }}
+export CATALINA_HOME={{ link_location }}
+
+
+###########################################
+# .bash_profile
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+        .~/.bashrc
+fi
+export JAVA_HOME=/usr/bin/java
+export PATH=$JAVA_HOME/bin:$PATH
+export CATALINA_BASE=/usr/share/tomcat10/
+export CATALINA_HOME=/usr/share/tomcat10/
+export CATALINA_PID="$CATALINA_BASE/tomcat.pid

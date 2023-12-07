@@ -1,0 +1,18 @@
+
+java_stage_dir: /opt/java
+java_version: 21.0.1
+java_major_version: 21
+java_tar_file: jdk-{{java_version}}_linux-{{arch}}_bin.tar.gz
+java_sym_dir: /usr/bin/java
+tomcat_user: ec2-user
+tomcat_psd: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          30376239623239346432356135303237616434336463313262613665633836373861646263623432
+          3863393637313764336432663839643236613930626130660a653133326161326236656637303831
+          65663661626430383931363864346131376532363061613436636561323239623433353034633538
+          3363316365393536300a386237323238353364663830623234373431663961326630613132396464
+          3736
+tomcat_major_version: 10
+minor_sub_version: 1.15
+tomcat_location: "/opt/tomcat{{tomcat_major_version}}"
+link_location: /usr/share/tomcat{{tomcat_major_version}}

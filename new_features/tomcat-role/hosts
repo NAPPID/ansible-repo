@@ -1,0 +1,53 @@
+#Sai
+
+[webservers]
+192.168.1.8
+192.168.1.7
+
+[ubuntu]
+192.168.1.4
+192.168.10.48
+
+[cent]
+192.168.1.20
+
+[tomcat]
+#tomcat-host1 ansible_host=44.204.210.231 ansible_user=osboxes1 ansible_ssh_pass=osboxes.org
+tomcat-host1 ansible_host=3.223.136.1 ansible_user=ec2-user ansible_ssh_private_key_file=../../../NAP-key.pem
+tomcat-host2 ansible_host=3.216.29.173 ansible_user=ec2-user ansible_ssh_private_key_file=../../../pem-key.pem
+
+
+[k8s-nodes]
+#20.232.11.77 ansible_host=20.232.11.77
+#137.117.122.168  ansible_host=137.117.122.168
+34.31.90.184
+34.135.201.115
+
+[k8s-master]
+34.30.102.148
+
+[vms:children]
+tomcat
+ubuntu
+
+[k8s:children]
+k8s-nodes
+k8s-master
+
+[rhel]
+192.168.1.14
+192.168.1.13
+ukdc2-2c-pscapp.worldpaytd.local
+ukdc2-2c-pscconfig.worldpaytd.local
+ukdc2-3c-pscconfig.worldpaytd.local
+ukdc2-4c-pscconfig.worldpaytd.local
+[dev:children]
+ubuntu
+rhel
+
+[linux:children]
+cent
+rhel
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3
