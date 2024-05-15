@@ -348,7 +348,7 @@ Files .bash_logout,.bash_profile and .bashrc will be created default for all use
 cat /etc/shadow --> This can give you the user info (user name, password, some of it's properties) will be encrypted.
 cat /etc/	
 
-
+aws ec2 describe-vpcs | jq ".Vpcs[].VpcId" -r
 
 ################     editors (vi)        ############################
 
@@ -485,9 +485,47 @@ grep -E "^[xy]" file ---> looking for pattren either starts with 'x' or 'y'.
 grep -E "[^xy]" file ----> looking pattrens which are not have eitther 'x' and 'y'. 
 grep -E "yf{4}" file ----> look for pattren "yfffff". Alternative: grep -E "yfffff" file. 
 grep -E "yf{3,4}" file ----> char 'f' may repeats either '3' or '4' times.
-grep -E "yf{3,4}\b" ----> char 'f' may repeat 3 or 4 times, but should have space after the word. 
+grep -E "yf{3,4}\b" or \s can be used----> char 'f' may repeat 3 or 4 times, but should have space after the word. 
 
+Source: https://www.youtube.com/watch?v=DTzU1ZAINxc&list=PLmHutWNYnDaPwB4LjXgtFqz8UdkIrKkpF&index=5
 
+awk -F ':' '/^[^t]/ {print NR,$1,$7}' /etc/passwd  ---> user names & their shells from password file which are not starts with latter 't'
+awk '/^d.*n$/{print}' /etc/passwd ---> lines starts with 'd' and end with 'n'
+grep 'o\{2,3\}' /etc/passwd  ----> char 'o' can repeat 2 or 3 times in a row.
+grep '[0-9][A-Z]\{3\}[0-9]\{3\}' file1  ---> 0-9 one char, A-Z three chars, 0-9 three chars from file1. 
+
+wild card chars:
+
+grep '.' /etc/passwd  ---> any char from the file
+grep [abc] /etc/passwd ---> any single char from the set
+grep [a-c] /etc/passwd ---> any single char from the range
+grep [^abc] /etc/passwd ---> any single char not from the set
+grep [^a-c] /etc/passwd ---> any single char not from the range     
+grep 'c[^uo]t' file1  ---> not displaying either cut or cot from file1
+
+modifiers: 
+
+*: Zero or more of the previous char
+\+: one or more of the previous char
+\?: zero or one of the previous char
+\{i\}: exactly 'i' times of the previous char
+\{i,\}: from i to any number of times of the previous char
+\{i,j\}: either i or j number of times of the previous char
+
+Anchors:
+
+^ : Starts with  ----> if this symbol reside in brackets [] , then it reversal. 
+$ : Ends with
+\<: Word begins with
+\>: word end with
+
+grep '^Th' file1 ---> file starts with Th
+grep '^caaaaaaar$'
+grep '\<cat' file1
+grep 'od\>' file1
+grep '\<cat\>' file1
+grep '^N.*d$' file1
+grep '^[^Ta]' file1
 
 ################################################# cut command  ###############################
 head /etc/passwd | cut -c 2
@@ -500,6 +538,49 @@ ansible --version | grep -E "^ansible" | cut -d ' ' -f 2  or ansible --version |
 head -n 5 /etc/passwd | cut -d ':' -f 1-4 | tr ':' ' ' ---> replacing symbol ':' with space' ' from the output.
 head -n 5 /etc/passwd | cut -d ':' -f 1-4 | tr ':' ' ' | tr [:lower:] [:upper:]  ---> convert generated output from lower chars to upper chars.
 echo "!@#$%^&*" | fold -1 | shuf | head -1
+
+
+################################# AWK ##############################################################
+ 
+kubectl get nodes -o json| jq | awk -F '/' '/providerID/{print $5}' | tr '"' ' '
+kubectl get pods | awk 'NR>=2{print $1}'
+kubectl get pods | awk '{print NR,$0}'
+kubectl get pods | awk '{print $NF}'
+kubectl get pods | awk '{print $1}' | sed '1d'
+kubectl get pods | sed '1d' | awk '{print $1}'
+kubectl get pods | awk '{print $1}' | tail +2
+kubectl get pods | awk '/myapp/{print $1}'
+kubectl get pods | awk '{print $1}' | grep -iv "name"
+awk 'NR>=2&&NR<4 {print NR,$0}' temp | sed 's/one/five/'F
+awk '/bus/ NR>10 && NR<=15 {print NR,$0}' /etc/passwd
+awk '/bus/ NR>10 && NR<=15 {print NR,$1,$2,$NF}' /etc/passwd
+
+
+################################################# Crontab ###########################################
+
+minutes hours date month day
+
+
+###############################  SED ###############################################################
+
+sed '/^$/d' /tmp/test.txt ---> Displaying the content without empty lines
+sed -i '/^$/d' /tmp/test.txt ---> Modifying the file without any empty lines
+kubectl get pods | awk '{print $1}' | sed '1d'
+kubectl get pods | sed '1d' | awk '{print $1}'
+
+sed 's/one/five/' temp.txt
+sed 's/one/five/g' temp.txt
+sed 's/one/five/2g' temp.txt
+sed 's/one/five/gp' temp.txt
+sed '2 s/one/five/g' temp.txt
+sed '2,5 s/one/five/gp' temp.txt
+sed '2,$ s/one/five/gp' temp.txt
+sed -n '2,$ s/one/five/gp' temp.txt
+sed '1d' temp.txt
+sed '1,3d' temp.txt
+sed '1,$d' temp.txt
+sed '/one/d' temp | sed '/^$/d'
+awk 'NR>=2&&NR<4 {print NR,$0}' temp | sed 's/one/five/'
 
 
 

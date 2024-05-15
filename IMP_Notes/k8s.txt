@@ -14,6 +14,8 @@ kubectl get pods -l label=
 
 kubectl get pods --selector app=redis
 
+kubectl label pod myapp name=nginx ---> Assiging label 'name' to pod
+
 kubects logs <pod name>
 
 kubectl delete --all pods
@@ -101,3 +103,427 @@ kubectl set image deployment <name of Deployment> nginx=sreeharshav/rollingupdat
 kubectl set image deployment <name of deployment> nginx=sreeharshav/testcontainer:v1  ---> This will take time  
 
 Updates very quick when compare with RC/RS, 
+
+kubectl create deploy myapp --image nginx:latest --dry-run -o yaml | ku neat 
+
+echo ' ' | kubectl apply -f -
+
+
+kubectl create deploy myapp --image nginx:latest --dry-run -o yaml
+
+ echo 'apiVersion: apps/v1
+>> kind: Deployment
+>> metadata:
+>>   creationTimestamp: null
+>>   labels:
+>>     app: myapp
+>>   name: myapp
+>> spec:
+>>   replicas: 3
+>>   selector:
+>>     matchLabels:
+>>       app: myapp
+>>   strategy: {}
+>>   template:
+>>     metadata:
+>>       creationTimestamp: null
+>>       labels:
+>>         app: myapp
+>>     spec:
+>>       containers:
+>>       - image: nginx:latest
+>>         name: nginx
+>>         resources: {}
+>> status: {}' | kubectl apply -f -
+
+kubectl expose deployment myapp --port 80 --type NodePort
+
+
+rcs=$(kubectl get rs | awk '{print $1}' | tail -n 4)
+for rc in $rcs; 
+do 
+kubectl describe rs $rc | grep -Ei "image" | awk '{print $2}' | tail -n 1; 
+done
+
+kubectl set image deployment myapp nginx=httpd:latest --record
+
+kubectl rollout status deployment/nginx-deployment
+
+kubectl get deployments myapp
+
+kubectl get rs
+
+kubectl get rs -w ----> for live watch
+
+kubectl rollout undo deployment myapp 
+
+kubectl rollout undo deployment myapp --to-revision=2
+
+
+we should apply resource quotas & limit ranges over the cluster objects. 
+ Resource Quotas: Limit the resource quota over entire name space, also this can be used to limit the number of deployed resources. such as howmany of pods, deployments has to be deployed. but here we don't have any control over the pods, deployments,....
+ LimitRanges: This has to be implemented for limit the resources on all objects which are reside on purticular name space. 
+ 
+ Also we can limit the resource utilization pod/container level in manifest file. 
+ 
+ Jobs can be scheduled for making purticualr task from K8s resources. 
+ 
+ Also same task can be performed with a fixed intervels by using cronJobs. ----->ex: copying files, backup SQL for every hour. 
+ 
+ kubectl api-resources
+ 
+ kubectl api-resources --namespaced=true
+ 
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: myapp
+  name: myapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myapp
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        resources:
+         requests:
+          cpu: "400m"
+          memory: "1Gi"
+         limits:
+          cpu: "700m"
+          memory: "2Gi"
+status: {}
+
+fname=$(ls -l | grep -iE "^-" | awk '{print $9}')
+for fn in $fname ; do if [ $(stat $fn | grep -i size | cut -d ':' -f 2 | awk '{print $1}') -eq 0 ]; then echo "size of $fn is zero"; fi; done
+
+export KUBECONFIG=config
+
+create role
+
+
+#################################################      RBAC in GKE    ############################################################
+
+openssl genrsa -out anand.key 2048
+
+openssl req -new -key anand.key -out anand.csr -subj "/CN=anand/O=development" 
+
+ ENCODED=$(cat anand.csr | base64 | tr -d "\n")
+
+echo $ENCODED
+
+apiVersion: certificates.k8s.io/v1
+kind: CertificateSigningRequest
+metadata:
+  name: bala
+spec:
+  request: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0KTUlJQ2FUQ0NBVkVDQVFBd0pERU5NQXNHQTFVRUF3d0VZbUZzWVRFVE1CRUdBMVVFQ2d3S2NISnZaSFZqZEdsdgpiakNDQVNJd0RRWUpLb1pJaHZjTkFRRUJCUUFEZ2dFUEFEQ0NBUW9DZ2dFQkFPYmgraG85eVNhVmo2bVgxcFhPCi81TUs5UndWRWQwajB2dUhNTkgwOWpiUEdlR3ZIRnA1dTIzcUdkWGJOZmNab1ovcGxlNTRFdk1KUzhOOXhWenQKdGhzY1BPNEZZcmZWcFNYc0YzZnhkb0kyL3labUZSZ1V2dklXQ2VSbk9DQzJ1Sng2OTZMTnBNS3B5cURFMUFraAp1QXZ2Nmc1Q2d3UnNLOEswZVFudmxtV3JUSWd1S1BpbmFVRTkxMmVVQWp5QUpNNGtESEl6a1JVRTlBeU5SYVFiCk9DNklHOUQvb01KdEdNV2toanNDRG1LdVNPK0ZTL0JpVGkydHlMT0gzUnFQaXhkWmlPMXkyR3d3N1hIYmk3ZUUKZklkNnA3TlV2M01JZUJtWnQvbzdoUjF6R1lmUmtvNWFBbm53dWlUQ0xOL2JJWHY1UTFjVUNmZkFWRk9RMTZMWgpxL2tDQXdFQUFhQUFNQTBHQ1NxR1NJYjNEUUVCQ3dVQUE0SUJBUUM5VHpvRFRjVDlTK0czMUhVa2NYZjlwV2I2Ci9tQUtKMmJVY3FVellvQ3JVOU5CczZHeGhzejBWcS9tT1Z6UlVDRTB0NUlVaHQ1ZWFETFByS0sxVnNHNkR2d2UKUU1zREt6NVp0c1dSVGo5a0VFRGdNZmpiNnV1SjVDME5GR0RMQlhsekZ1NVQrU2RRdTN2UjBlRk5PanEyaHA1agowRmJraHBiVGd2bno2aUp0amNiVTk0NkR5QzFQdjVtQ0Nzd1k5dzBzZS9GVFZUOVBMTk5jVTFmK05pbDZrZEtJCmFpRUkyNEpMVUxZUW40UmtJWXhyTGtSbUZyZG1HeWhmRDJyWGdSN2tid3BEOXpTUUFQVERtcnBZbkh3eDlpakcKYVkxLzQwd0VxMlF3WWtWNmdnQy9WYmdqWjlVM3VyVVFBTWVpbys1STNPMXpmckZ5V3VsU2RWMVpKZVQ5Ci0tLS0tRU5EIENFUlRJRklDQVRFIFJFUVVFU1QtLS0tLQo=
+  signerName: kubernetes.io/kube-apiserver-client
+  #expirationSeconds: 86400  # Only supported on >=1.22
+  usages:
+  - client auth
+  
+kubectl get csr
+
+kubectl certificate approve anand
+
+kubectl get csr anand -o jsonpath='{.status.certificate}'| base64 -d > anand.crt
+cat anand.crt | openssl x509 -text
+
+ kubectl config set-credentials anand --client-key=anand.key --client-certificate=anand.crt --embed-certs=true
+ 
+ CURRENT_CONTEXT=$(kubectl config current-context)
+ 
+ echo $CURRENT_CONTEXT
+ 
+  kubectl create ns development
+  
+   kubectl config set-context anand --cluster=$CURRENT_CONTEXT --namespace=development --user=anand
+   
+   kubectl config get-contexts
+   
+    kubectl get pods
+    
+    kubectl get pods --context anand
+    
+    kubectl config view | less
+    
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+ name: anand-role-binding
+ namespace: development
+subjects:
+ - apiGroup: rbac.authorization.k8s.io
+   kind: User
+   name: anand
+roleRef:
+ apiGroup: rbac.authorization.k8s.io
+ kind: Role
+ name: anand-role
+ 
+
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+ name: bala-role-binding
+ namespace: production
+subjects:
+ - apiGroup: rbac.authorization.k8s.io
+   kind: User
+   name: bala
+roleRef:
+ apiGroup: rbac.authorization.k8s.io
+ kind: Role
+ name: bala-role
+ 
+ 
+AKIAZ7K3T3CIT6O2RGM5
+o3/RVvR0Zmv3R06b55KJsDHYWhu9G9TkcuvqrHhY
+
+
+kubectl config set-context --current --namespace=development
+
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+
+
+##########################   KOPS  #########################################
+
+export KOPS_STATE_STORE=s3://mungaras783
+
+kops create cluster --name=k8sapp.info \
+  --state=s3://mungaras783 \
+  --zones=us-east-1a \
+  --node-count=2
+
+kops delete cluster --name=k8sapp.info --yes
+
+
+
+sg=$(aws ec2 describe-security-groups | jq  '.SecurityGroups[] | select(.GroupName | contains("nodes")) | .GroupId' -r)
+
+aws ec2 authorize-security-group-ingress \
+    --group-id $sg \
+    --protocol -1 \
+    --port -1 \
+    --cidr 0.0.0.0/0
+
+
+################################### Volumes  #########################################
+
+RAW Volume
+
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    role: dev
+  name: my-app1
+spec:
+  containers:
+   - image: nginx
+     name: my-app1
+     volumeMounts:
+      - name: awsvolume
+        mountPath: /usr/share/nginx/html
+      
+  volumes:
+   - name: awsvolume
+     awsElasticBlockStore:
+      volumeID: vol-0f40ecd663361edd3
+      fsType: ext4
+      
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysvc
+  labels:
+   role: dev
+spec:
+  type: NodePort
+  selector:
+   role: dev
+  ports:
+  - port: 80
+    targetPort: 80
+
+
+#############################  Storage Classes  ###############################################
+ 
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+ name: high
+provisioner: kubernetes.io/aws-ebs
+parameters:
+ type: io1
+reclaimPolicy: Retain
+allowVolumeExpansion: true
+mountOptions:
+ - debug
+volumeBindingMode: Immediate
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+ name: medium
+provisioner: kubernetes.io/aws-ebs
+parameters:
+ type: gp2
+reclaimPolicy: Retain
+allowVolumeExpansion: true
+mountOptions:
+ - debug
+volumeBindingMode: Immediate
+
+#################################  PV #############################
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+ name: aws-io1-pv1
+ labels:
+  type: io1
+spec:
+ storageClassName: high
+ persistentVolumeReclaimPolicy: Retain
+ capacity:
+  storage: 2Gi
+ accessModes:
+  - ReadWriteOnce
+ awsElasticBlockStore:
+  volumeID: vol-0087eb52a1253da5b
+  fsType: ext4
+  
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+ name: aws-io1-pv2
+ labels:
+  type: io1
+spec:
+ storageClassName: high
+ persistentVolumeReclaimPolicy: Retain
+ capacity:
+  storage: 2Gi
+ accessModes:
+  - ReadWriteOnce
+ awsElasticBlockStore:
+  volumeID: vol-0087eb52a1253da5b
+  fsType: ext4
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+ name: aws-gp2-pv1
+ labels:
+  type: gp2
+spec:
+ storageClassName: medium
+ persistentVolumeReclaimPolicy: Retain
+ capacity:
+  storage: 2Gi
+ accessModes:
+  - ReadWriteOnce
+ awsElasticBlockStore:
+  volumeID: vol-08c968dc0f6d7957b
+  fsType: ext4
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+ name: aws-gp2-pv2
+ labels:
+  type: gp2
+spec:
+ storageClassName: medium
+ persistentVolumeReclaimPolicy: Retain
+ capacity:
+  storage: 2Gi
+ accessModes:
+  - ReadWriteOnce
+ awsElasticBlockStore:
+  volumeID: vol-08c968dc0f6d7957b
+  fsType: ext4
+  
+###################### Testing ####################
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+ name: aws-gp2-pv4
+ labels:
+  type: gp2
+spec:
+ storageClassName: medium
+ persistentVolumeReclaimPolicy: Retain
+ capacity:
+  storage: 20Gi
+ accessModes:
+  - ReadWriteOnce
+ awsElasticBlockStore:
+  volumeID: vol-08c968dc0f6d7957b
+  fsType: ext4
+  
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+ name: aws-io1-pv3
+ labels:
+  type: gp2
+spec:
+ storageClassName: high
+ persistentVolumeReclaimPolicy: Retain
+ capacity:
+  storage: 20Gi
+ accessModes:
+  - ReadWriteOnce
+ awsElasticBlockStore:
+  volumeID: vol-08c968dc0f6d7957b
+  fsType: ext4
+  
+################################################## PVC #################################################################
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+ name: pvc1
+ labels:
+  type: high
+spec:
+ storageClassName: high
+ accessModes:
+  - ReadWriteOnce
+ resources:
+  requests:
+   storage: 12Gi
+
+
+IO1: vol-0087eb52a1253da5b
+gp2: vol-08c968dc0f6d7957b
+
+
+apt install procps
+
+
+vol-0016a33819e9f5cfe
