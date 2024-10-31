@@ -1,0 +1,55 @@
+
+
+---
+- name: Play for psc cert renewal
+  hosts: ubuntu
+  become: yes
+  become_user: root
+  become_method: sudo
+  vars:
+   certs:
+    - psc_console.crt
+    - psc_console.pem
+    - psc_console.p12
+    - psc_console.jks
+  tasks:
+   - name: identify pfx file
+     shell: "ls -lrt *.pfx"
+     register: pfx
+     delegate_to: localhost
+     ignore_errors: yes
+   - name: set the facts
+     set_fact:
+      pfx_name: "{{pfx.stdout_lines[0].split()[8]}}"
+   - name: output the pfx result
+     debug:
+      msg: 
+       - "{{pfx_name}}"
+     delegate_to: localhost
+     run_once: true
+   - name: copy the {{pfx_name}} to {{inventory_hostname}}
+     copy:
+      src: "{{pfx_name}}"
+      dest: psc_console.pfx
+     run_once: true
+   - name: capturing current date
+     shell: echo $(date +"%d-%b-%Y")
+     register: date
+   - name: create folder with current time stamp {{date.stdout}} in localhost
+     file:
+      path: ./{{date.stdout}}
+      state: directory
+     delegate_to: localhost
+     run_once: true
+   - name: fetching the files into localhost from {{inventory_hostname}}
+     fetch:
+      src: ./{{item}}
+      dest: ./{{date.stdout}}/
+      flat: yes
+     run_once: true
+     loop: "{{certs}}"
+   - name: output the date command
+     debug:
+      var: date
+ 
+

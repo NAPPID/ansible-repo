@@ -1,0 +1,86 @@
+
+
+---
+- name: Checking block module
+  hosts: ubuntu
+  become: yes
+  become_method: sudo
+  become_user: root
+  vars:
+   dirt: psc
+  tasks:
+   - name: Starting block section
+     block:
+      - name: Checking for existing folder
+        command: "ls -lrt /var/psc/"
+        register: dir
+      - debug:
+         var: dir
+      - name: Creating folder task after task failure
+        debug:
+         msg:
+          - "\n This is mesage after the task fails"
+      - name: Removing folder /var/psc for {{inventory_hostname}}
+        file:
+         path: /var/psc
+         state: absent
+     when: inventory_hostname == '192.168.1.15'
+    #ignore_errors: yes
+     rescue: 
+      - name: Executing rescue module and Removing folders from /var/psc/ location
+        file:
+         path: /var/psc/
+         state: absent
+      - name: Executing rescue part
+        debug:
+         msg:
+          - " \n folder /var/psc/ is not existed"
+          - "{{ansible_failed_task.name}}"
+          - "{{ansible_failed_result.stderr_lines[0]}}"
+            #- name: stopping the play due to errors
+            #meta: end_play
+     always:
+      - name: Executing always section
+        debug:
+         msg:
+          - "\n This always section should execute irrespective of the results"
+      - include_tasks: alway.yml
+   
+   - name: Starting block section
+     block:
+      - name: Checking for existing folder
+        command: "ls -lrt /var/psc/"
+        register: dir
+      - debug:
+         var: dir
+      - name: Creating folder task after task failure
+        debug:
+         msg:
+          - "\n This is mesage after the task fails"
+      - name: Removing folder /var/psc for {{inventory_hostname}}
+        file:
+         path: /var/psc
+         state: absent
+     when: inventory_hostname == '192.168.1.14'
+    #ignore_errors: yes
+     rescue:
+      - name: Executing rescue module and Removing folders from /var/psc/ location
+        file:
+         path: /var/psc/
+         state: absent
+      - name: Executing rescue part
+        debug:
+         msg:
+          - " \n folder /var/psc/ is not existed"
+          - "{{ansible_failed_task.name}}"
+          - "{{ansible_failed_result.stderr_lines[0]}}"
+     always:
+      - name: include task from same folder
+        include_tasks: alway.yml
+
+
+           
+   - name: Execting tasks out of block section
+     debug:
+      msg:
+       - " \n executing tasks out of block"

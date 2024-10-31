@@ -1,0 +1,44 @@
+
+---
+- name: Displaying time stamp
+  hosts: ubuntu
+  vars:
+   node_loc: /var/www/html
+  tasks:
+   - name: Checking {{node_loc}} for all machines
+     command: ls -lrt {{node_loc}}
+     register: dir
+   - name: using command module capturing output
+     command: date +"%Y-%m-%d"
+     register: time
+   - name: Create backup folders 
+     file:
+      name: /tmp/{{time.stdout}}
+      state: directory
+     register: backup
+     when: item is succeeded
+     with_items:
+      - "{{dir}}"
+   - name: Copy old files to backup folder
+     copy:
+      src: "{{node_loc}}/server.xml"
+      dest: /tmp/{{time.stdout}}
+      remote_src: true
+     when: item is succeeded
+     with_items:
+      - "{{dir}}"
+   - name: Copying latest files into {{node_loc}}
+     copy:
+      src: server.p12
+      dest: "{{node_loc}}/"
+     when: item is succeeded
+     with_items:
+      - "{{dir}}"
+   - name: output the time var
+     debug:
+      var: "{{item}}"
+     with_items:
+       - time
+       - time.stdout
+       - backup
+

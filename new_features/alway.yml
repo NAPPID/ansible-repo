@@ -1,0 +1,11 @@
+
+
+ - name: Debug the results from different play from same folder
+   debug:
+    msg: 
+     - "Running always from different play"
+ - name: Removing {{dirt}} from {{inventory_hostname}}
+   file:
+    path: /tmp/{{dirt}}
+    state: absent
+

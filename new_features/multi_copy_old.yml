@@ -1,0 +1,31 @@
+
+
+---
+- name: Checking the foldrt status for multiple servers
+  hosts: ubuntu
+  become: yes
+  vars:
+   p12_path: /tmp/copy/
+   server:
+    - 192.168.1.14
+    - 192.168.1.15
+  tasks:
+   - name: Checking status of folder in {{inventory_hostname}}
+     command: ls {{p12_path}}
+     ignore_errors: yes
+     register: st
+     when: inventory_hostname in server
+     tags:
+      - reg
+   - name: Create folder if it's not existed
+     copy:
+      src: server.xml
+      dest: /tmp/copy/
+     when: ( item is succeeded ) and ( inventory_hostname in server)
+     with_items:
+      - "{{st}}"
+   - name: output the results
+     debug:
+      var: st
+     tags:
+      - reg
