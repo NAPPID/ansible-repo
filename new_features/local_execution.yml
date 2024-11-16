@@ -8,7 +8,7 @@
    action: directory
   tasks:
    - name: renaming the file
-     command: "mv ukdc2-2c-config.worldpaytd.local.pfx psc_console.pfx"
+     command: "mv ukdc2-2c-config.localpaytd.local.pfx psc_console.pfx"
      delegate_to: localhost
      run_once: yes
      tags:
