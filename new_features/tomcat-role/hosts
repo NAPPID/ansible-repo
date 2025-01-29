@@ -37,10 +37,10 @@ k8s-master
 [rhel]
 192.168.1.14
 192.168.1.13
-ukdc2-2c-pscapp.worldpaytd.local
-ukdc2-2c-pscconfig.worldpaytd.local
-ukdc2-3c-pscconfig.worldpaytd.local
-ukdc2-4c-pscconfig.worldpaytd.local
+ukdc2-2c-pscapp.localpaytd.local
+ukdc2-2c-pscconfig.localpaytd.local
+ukdc2-3c-pscconfig.localpaytd.local
+ukdc2-4c-pscconfig.localpaytd.local
 [dev:children]
 ubuntu
 rhel
